@@ -5,6 +5,7 @@ from app.services.login_service import login_user
 from app.services.profile_service import get_profile
 from app.services.forgot_service import forgot_password
 from app.services.question_service import create_question, get_questions, get_question_by_id, delete_question
+from app.services.answer_service import create_answer, get_answers, get_answer_by_id, delete_answer
 
 def init_routes(app):
     @app.route('/register', methods=['POST'])
@@ -71,6 +72,7 @@ def init_routes(app):
                 return create_question(data["question_text"], data["category"], data["status"])
             except Exception as e:
                 return {"error": str(e)}, 500
+
     @app.route('/question/<int:question_id>', methods=['GET'])
     def question_by_id(question_id):
         return get_question_by_id(question_id)
@@ -78,3 +80,25 @@ def init_routes(app):
     @app.route('/question/<int:question_id>', methods=['DELETE'])
     def remove_question(question_id):
         return delete_question(question_id)
+
+    @app.route('/answers', methods=['GET'])
+    def answers():
+        return get_answers()
+
+    @app.route('/answer', methods=['POST'])
+    def add_answer():
+        try:
+            data = request.get_json()
+            if not data or "title" not in data:
+                return {"error": "Missing required fields"}, 400
+            return create_answer(data["title"])
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+    @app.route('/answer/<int:answer_id>', methods=['GET'])
+    def answer_by_id(answer_id):
+        return get_answer_by_id(answer_id)
+
+    @app.route('/answer/<int:answer_id>', methods=['DELETE'])
+    def remove_answer(answer_id):
+        return delete_answer(answer_id)
