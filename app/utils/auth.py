@@ -16,7 +16,7 @@ def jwt_required(f):
             token = auth_header.split(" ")[1]
             decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_token["user_id"]
-            return f(user_id, *args, **kwargs)  # Mengirim user_id ke fungsi endpoint
+            return f(user_id, *args, **kwargs) 
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token has expired"}), 401
         except jwt.InvalidTokenError:

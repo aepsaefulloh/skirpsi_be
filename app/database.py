@@ -3,7 +3,6 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 def get_db_connection():
@@ -32,20 +31,36 @@ def init_db():
     ''')
 
     cursor.execute('''
-            CREATE TABLE IF NOT EXISTS m_questions (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                question_text TEXT NOT NULL,
-                category VARCHAR(100) NOT NULL,
-                status SMALLINT(2) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+        CREATE TABLE IF NOT EXISTS forms (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS m_answers (
+        CREATE TABLE IF NOT EXISTS form_questions (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(100) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            form_id INT NOT NULL,
+            question_text TEXT NOT NULL,
+            category VARCHAR(100) NOT NULL,
+            options JSON DEFAULT NULL,
+            status SMALLINT NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS form_answers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            form_id INT NOT NULL,
+            question_id INT NOT NULL,
+            user_id INT NOT NULL,
+            answer_text TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
+            FOREIGN KEY (question_id) REFERENCES form_questions(id) ON DELETE CASCADE
         )
     ''')
     conn.commit()

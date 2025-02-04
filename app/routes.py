@@ -1,13 +1,14 @@
-# app/routes.py
 from flask import request, jsonify
+from flask_cors import CORS  # Import CORS
 from app.services.register_service import register_user
 from app.services.login_service import login_user
 from app.services.profile_service import get_profile
 from app.services.forgot_service import forgot_password
-from app.services.question_service import create_question, get_questions, get_question_by_id, delete_question
-from app.services.answer_service import create_answer, get_answers, get_answer_by_id, delete_answer
+from app.services.form_service import get_forms, create_form, get_form, submit_answers
 
 def init_routes(app):
+    CORS(app)  # Enable CORS for all routes
+
     @app.route('/register', methods=['POST'])
     def register():
         try:
@@ -53,52 +54,32 @@ def init_routes(app):
             return get_profile(token.split(" ")[1])
         except Exception as e:
             return {"error": str(e)}, 500
-
-    @app.route('/questions', methods=['GET'])
-    def questions():
-        status = request.args.get('status')  # Ambil parameter status jika ada
-        return get_questions(status=status)
-
-    @app.route('/question', methods=['GET', 'POST'])
-    def question():
-        if request.method == 'GET':
-            status = request.args.get('status')  # Ambil parameter status jika ada
-            return get_questions(status=status)
-        elif request.method == 'POST':
-            try:
-                data = request.get_json()
-                if not data or "question_text" not in data or "category" not in data or "status" not in data:
-                    return {"error": "Missing required fields"}, 400
-                return create_question(data["question_text"], data["category"], data["status"])
-            except Exception as e:
-                return {"error": str(e)}, 500
-
-    @app.route('/question/<int:question_id>', methods=['GET'])
-    def question_by_id(question_id):
-        return get_question_by_id(question_id)
-
-    @app.route('/question/<int:question_id>', methods=['DELETE'])
-    def remove_question(question_id):
-        return delete_question(question_id)
-
-    @app.route('/answers', methods=['GET'])
-    def answers():
-        return get_answers()
-
-    @app.route('/answer', methods=['POST'])
-    def add_answer():
+    @app.route('/forms', methods=['GET'])
+    def forms():
+        return get_forms()
+    
+    @app.route('/forms', methods=['POST'])
+    def add_form():
         try:
             data = request.get_json()
-            if not data or "title" not in data:
+            if not data or "title" not in data or "questions" not in data:
                 return {"error": "Missing required fields"}, 400
-            return create_answer(data["title"])
+            return create_form(data["title"], data["questions"])
         except Exception as e:
             return {"error": str(e)}, 500
 
-    @app.route('/answer/<int:answer_id>', methods=['GET'])
-    def answer_by_id(answer_id):
-        return get_answer_by_id(answer_id)
+    @app.route('/form/<int:form_id>', methods=['GET'])
+    def form_by_id(form_id):
+        return get_form(form_id)
 
-    @app.route('/answer/<int:answer_id>', methods=['DELETE'])
-    def remove_answer(answer_id):
-        return delete_answer(answer_id)
+    @app.route('/form/<int:form_id>/submit', methods=['POST'])
+    def submit_form_answers(form_id):
+        try:
+            data = request.get_json()
+            if not data or "answers" not in data:
+                return {"error": "Missing required fields"}, 400
+            return submit_answers(form_id, data["answers"])
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+        
