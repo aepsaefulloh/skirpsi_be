@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 04, 2025 at 11:55 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Feb 04, 2025 at 05:12 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.1.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -30,7 +30,6 @@ SET time_zone = "+00:00";
 CREATE TABLE `forms` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `status` smallint(6) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -38,13 +37,9 @@ CREATE TABLE `forms` (
 -- Dumping data for table `forms`
 --
 
-INSERT INTO `forms` (`id`, `title`, `status`, `created_at`) VALUES
-(1, 'Pertanyaan Tidak Penting', 1, '2025-02-04 09:00:19'),
-(2, 'asdasdsad', 1, '2025-02-04 09:28:55'),
-(3, 'judul1', 1, '2025-02-04 09:29:41'),
-(4, 'asdasdasdasd', 0, '2025-02-04 10:26:09'),
-(5, 'asdsadsad', 0, '2025-02-04 10:26:56'),
-(7, 'asdasd', 1, '2025-02-04 10:38:07');
+INSERT INTO `forms` (`id`, `title`, `created_at`) VALUES
+(1, 'Survey Pelanggan', '2025-02-02 19:22:36'),
+(2, 'Pertanyaan Random', '2025-02-02 19:50:52');
 
 -- --------------------------------------------------------
 
@@ -82,14 +77,9 @@ CREATE TABLE `form_questions` (
 --
 
 INSERT INTO `form_questions` (`id`, `form_id`, `question_text`, `category`, `options`, `status`, `created_at`) VALUES
-(1, 1, 'Apakah anda sering makan ?', 'rating', '[\"Ya\", \"Tidak\"]', 1, '2025-02-04 09:00:19'),
-(2, 1, 'Makanan apa yang anda suka ?', 'rating', '[\"Pisang\", \"Bakwan\", \"Nasi Goreng\", \"Batu Bata\", \"Semut\"]', 1, '2025-02-04 09:00:19'),
-(3, 1, 'Kendaraan apa saja yang anda miliki ?', 'multiple_choice', '[\"Pesawat\", \"Motor\", \"Mobil\", \"Kereta\", \"Sepeda\", \"Pesiar\", \"Helikopter\", \"Kuda\"]', 1, '2025-02-04 09:00:19'),
-(4, 2, 'asdasdsadsad', 'text', '[]', 1, '2025-02-04 09:28:55'),
-(5, 3, 'asdasdsaa', 'text', '[]', 1, '2025-02-04 09:29:41'),
-(6, 4, 'aaac', 'text', '[]', 1, '2025-02-04 10:26:09'),
-(7, 5, 'lkasdlkasldd', 'text', '[]', 1, '2025-02-04 10:26:56'),
-(8, 7, 'dddd', 'text', '[]', 1, '2025-02-04 10:38:07');
+(1, 1, 'Seberapa nyaman kursi di restoran kami?', 'rating', '[\"Tidak nyaman\", \"Sedang\", \"Nyaman\", \"Sangat Nyaman\"]', 1, '2025-02-02 19:22:36'),
+(2, 1, 'Bagaimana kualitas makanan kami?', 'rating', '[\"Buruk\", \"Biasa\", \"Baik\", \"Sangat Baik\"]', 1, '2025-02-02 19:22:36'),
+(3, 2, 'Bagaimana ayam bisa terbang ?', 'rating', '[\"Ya\", \"Tidak\"]', 1, '2025-02-02 19:50:52');
 
 -- --------------------------------------------------------
 
@@ -155,7 +145,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `form_answers`
@@ -167,7 +157,7 @@ ALTER TABLE `form_answers`
 -- AUTO_INCREMENT for table `form_questions`
 --
 ALTER TABLE `form_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`

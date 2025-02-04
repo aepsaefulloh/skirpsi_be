@@ -18,7 +18,7 @@ def login_user(username, password):
         if user and bcrypt.checkpw(password.encode(), user["password"].encode()):
             token = jwt.encode({
                 "user_id": user["id"],
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24*7)
             }, SECRET_KEY, algorithm="HS256")
             return {"token": token}, 200
         else:
