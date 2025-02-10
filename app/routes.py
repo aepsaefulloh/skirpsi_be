@@ -4,7 +4,7 @@ from app.services.register_service import register_user
 from app.services.login_service import login_user
 from app.services.profile_service import get_profile
 from app.services.forgot_service import forgot_password
-from app.services.form_service import get_forms, create_form, get_form, submit_answers
+from app.services.form_service import get_forms, create_form, update_form, delete_form, get_form, submit_answers
 
 def init_routes(app):
     CORS(app)  # Enable CORS for all routes
@@ -65,6 +65,23 @@ def init_routes(app):
             if not data or "title" not in data or "questions" not in data:
                 return {"error": "Missing required fields"}, 400
             return create_form(data["title"], data["questions"])
+        except Exception as e:
+            return {"error": str(e)}, 500
+        
+    @app.route('/form/<int:form_id>', methods=['PUT'])
+    def update_form_route(form_id):
+        try:
+            data = request.get_json()
+            if not data:
+                return {"error": "Missing request body"}, 400
+            return update_form(form_id, data.get("title"), data.get("questions"), data.get("status"))
+        except Exception as e:
+            return {"error": str(e)}, 500
+        
+    @app.route('/form/<int:form_id>', methods=['DELETE'])
+    def delete_form_route(form_id):
+        try:
+            return delete_form(form_id)
         except Exception as e:
             return {"error": str(e)}, 500
 

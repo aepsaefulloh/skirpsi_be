@@ -1,0 +1,9 @@
+install python 
+https://www.python.org/ftp/python/3.13.2/python-3.13.2-amd64.exe
+
+Cara jalanin Program
+    1. install python dengan versi yang sama
+    2. aktifkan xampp kemudian pada browser ketik http://localhost/phpmyadmin
+    3. buat nama database sesuai yang ada di .env atau file sql pada folder database dan kalo berhasil
+    4. ketikan "pip install -r requirements.txt" dengan CMD untuk install package yang digunakan
+    4. kalo udah install semua ketikan "py run.py" untuk running program python

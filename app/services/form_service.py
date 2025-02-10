@@ -2,11 +2,14 @@
 from flask import request, jsonify
 import json
 from app.database import get_db_connection
-from app.utils.auth import jwt_required  # Middleware JWT
+from app.utils.auth import jwt_required
 
 @jwt_required
-def create_form(user_id, title, questions, status=1):
+def create_form(user_id, title, questions):
     try:
+        data = request.json  
+        status = data.get("status", 0) 
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -27,7 +30,59 @@ def create_form(user_id, title, questions, status=1):
         return jsonify({"message": "Form created successfully", "form_id": form_id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+        
+@jwt_required
+def update_form(user_id, form_id, title=None, questions=None, status=None):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        if title:
+            cursor.execute("UPDATE forms SET title = %s WHERE id = %s", (title, form_id))
+        if status is not None:
+            cursor.execute("UPDATE forms SET status = %s WHERE id = %s", (status, form_id))
+        
+        print(status)
+
+        if questions:
+            for question in questions:
+                if "id" in question:
+                    options = json.dumps(question.get("options")) if "options" in question and isinstance(question["options"], list) else None
+                    cursor.execute(
+                        "UPDATE form_questions SET question_text = %s, category = %s, options = %s, status = %s WHERE id = %s",
+                        (question["question_text"], question["category"], options, question.get("status", 1), question["id"])
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO form_questions (form_id, question_text, category, options, status) VALUES (%s, %s, %s, %s, %s)",
+                        (
+                            form_id,
+                            question["question_text"],
+                            question["category"],
+                            json.dumps(question.get("options")),
+                            question.get("status", 1),
+                        )
+                    )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Form updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@jwt_required
+def delete_form(user_id, form_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM forms WHERE id = %s", (form_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Form deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @jwt_required
 def get_forms(user_id):
@@ -35,21 +90,26 @@ def get_forms(user_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        status = request.args.get("status", "1")
-        try:
-            status = int(status)
-            if status not in [0, 1]:
-                return jsonify({"error": "Invalid status value"}), 400
-        except ValueError:
-            return jsonify({"error": "Invalid status parameter"}), 400
+        status = request.args.get("status")
 
-        query = "SELECT * FROM forms WHERE status = %s"
-        cursor.execute(query, (status,))
+        if status is not None:
+            try:
+                status = int(status)
+                if status not in [0, 1]:
+                    return jsonify({"error": "Invalid status value. Must be 0 or 1"}), 400
+                query = "SELECT * FROM forms WHERE status = %s"
+                cursor.execute(query, (status,))
+            except ValueError:
+                return jsonify({"error": "Invalid status parameter"}), 400
+        else:
+            query = "SELECT * FROM forms"
+            cursor.execute(query)
+        
         forms = cursor.fetchall()
-
+        
         cursor.close()
         conn.close()
-        
+
         return jsonify({"forms": forms}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
