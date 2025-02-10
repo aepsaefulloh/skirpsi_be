@@ -1,6 +1,11 @@
 install python 
 https://www.python.org/ftp/python/3.13.2/python-3.13.2-amd64.exe
 
+xampp php versi 8
+https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.12/xampp-windows-x64-8.2.12-0-VS16-installer.exe
+
+*pastikan xampp dengan php versi 8
+
 Cara jalanin Program
     1. install python dengan versi yang sama
     2. aktifkan xampp kemudian pada browser ketik http://localhost/phpmyadmin
