@@ -5,7 +5,7 @@ from app.services.login_service import login_user
 from app.services.profile_service import get_profile
 from app.services.forgot_service import forgot_password
 from app.services.form_service import get_forms, create_form, update_form, delete_form, get_form, submit_answers
-
+from app.services.user_service import get_all_users, get_user_by_id, update_user
 def init_routes(app):
     CORS(app)  # Enable CORS for all routes
 
@@ -54,6 +54,24 @@ def init_routes(app):
             return get_profile(token.split(" ")[1])
         except Exception as e:
             return {"error": str(e)}, 500
+    @app.route('/users', methods=['GET'])
+    def users():
+        return get_all_users()
+
+    @app.route('/user/<int:user_id>', methods=['GET'])
+    def user_by_id(user_id):
+        return get_user_by_id(user_id)
+    
+    @app.route('/user/<int:user_id>', methods=['PUT'])
+    def update_user_route(user_id):
+        try:
+            data = request.get_json()
+            if not data:
+                return {"error": "Missing request body"}, 400
+            return update_user(user_id, data.get("fullname"), data.get("email"), data.get("date_of_birth"), data.get("nisn"), data.get("role"))
+        except Exception as e:
+            return {"error": str(e)}, 500
+
     @app.route('/forms', methods=['GET'])
     def forms():
         return get_forms()

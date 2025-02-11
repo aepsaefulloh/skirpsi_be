@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 10, 2025 at 07:49 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.1.12
+-- Generation Time: Feb 11, 2025 at 10:27 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `forms` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `status` smallint(6) NOT NULL DEFAULT 0,
+  `status` smallint(6) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -39,9 +39,7 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`id`, `title`, `status`, `created_at`) VALUES
-(1, 'Pertanyaan Tidak Penting', 1, '2025-02-04 09:00:19'),
-(3, 'judul1', 1, '2025-02-04 09:29:41'),
-(4, 'Judul ok', 0, '2025-02-04 10:26:09');
+(1, 'Pertanyaan mendasar seputar teknologi', 1, '2025-02-11 08:19:17');
 
 -- --------------------------------------------------------
 
@@ -79,11 +77,10 @@ CREATE TABLE `form_questions` (
 --
 
 INSERT INTO `form_questions` (`id`, `form_id`, `question_text`, `category`, `options`, `status`, `created_at`) VALUES
-(1, 1, 'Apakah anda sering makan ?', 'rating', '[\"Ya\", \"Tidak\"]', 1, '2025-02-04 09:00:19'),
-(2, 1, 'Makanan apa yang anda suka ?', 'rating', '[\"Pisang\", \"Bakwan\", \"Nasi Goreng\", \"Batu Bata\", \"Semut\", \"Kacang\"]', 1, '2025-02-04 09:00:19'),
-(3, 1, 'Kendaraan apa saja yang anda miliki ?', 'multiple_choice', '[\"Pesawat\", \"Motor\", \"Mobil\", \"Kereta\", \"Sepeda\", \"Pesiar\", \"Helikopter\", \"Kuda\"]', 1, '2025-02-04 09:00:19'),
-(5, 3, 'asdasdsaa', 'text', '[]', 1, '2025-02-04 09:29:41'),
-(6, 4, 'q 1', 'text', '[]', 1, '2025-02-04 10:26:09');
+(1, 1, 'Apakah anda menyukai pembahasan teknologi ?', 'text', '[]', 0, '2025-02-11 08:19:17'),
+(2, 1, 'Bagaimana anda menanggapi kemajuan teknologi ?', 'text', '[]', 0, '2025-02-11 08:19:17'),
+(3, 1, 'Sosial media yang anda gunakan saat ini ?', 'multiple_choice', '[\"Facebook\", \"Twitter\", \"Instagram\", \"Reddit\"]', 0, '2025-02-11 08:19:17'),
+(4, 1, 'Apakah anda memiliki pengalaman dibidang teknologi ?', 'rating', '[\"Ya\", \"Tidak\"]', 0, '2025-02-11 08:19:17');
 
 -- --------------------------------------------------------
 
@@ -99,6 +96,7 @@ CREATE TABLE `users` (
   `fullname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `date_of_birth` date DEFAULT NULL,
+  `role` int(11) NOT NULL DEFAULT 99,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -106,8 +104,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `nisn`, `fullname`, `email`, `date_of_birth`, `created_at`) VALUES
-(1, 'aepsaefulloh', '$2b$12$s8mfc3VioA2dfTuSaMJXc.dZORbp88hkzwq2Z3N.gIp0F9gkLzMPC', 1113335567, 'Aep Saefulloh', 'aepsaefulloh1396@gmail.com', '1996-01-01', '2025-02-02 16:41:10');
+INSERT INTO `users` (`id`, `username`, `password`, `nisn`, `fullname`, `email`, `date_of_birth`, `role`, `created_at`) VALUES
+(2, 'aepsaefulloh', '$2b$12$Nw2iGj63SHI.7fp6knmBpO3OM9LPvCDCHkezLGkhrL3jWowbQFoeC', 1233211231, 'Aep Saefulloh', 'aepsaefulloh1396@gmail.com', '1996-04-03', 1, '2025-02-11 08:03:15'),
+(3, 'guest', '$2b$12$DqhBIe/IlnPB9uxTaWS5Nu0rzs2xLZaTyKpJu1jdkaEozT5Qrkdku', 1231322221, 'Guest', 'guest@gmail.com', '2025-02-04', 99, '2025-02-11 08:14:28'),
+(4, 'superadmin', '$2b$12$4kF9zfmpJC7jCxSmBIhklO82TddQDrdjYQsacu7wBso4zcnXKgbPu', 1113332254, 'Super Admin', 'superadmin@gmail.com', '2025-02-11', 1, '2025-02-11 08:15:11');
 
 --
 -- Indexes for dumped tables
@@ -149,25 +149,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `form_answers`
 --
 ALTER TABLE `form_answers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `form_questions`
 --
 ALTER TABLE `form_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables

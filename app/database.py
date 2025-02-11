@@ -26,6 +26,7 @@ def init_db():
             fullname VARCHAR(100) NOT NULL,
             email VARCHAR(100) NOT NULL,
             date_of_birth DATE,
+            role INT NOT NULL DEFAULT 99,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
