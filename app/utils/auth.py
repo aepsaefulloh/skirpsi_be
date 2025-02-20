@@ -31,7 +31,8 @@ def jwt_required(f):
             
             # Role-based handling
             if user["role"] == 99:
-                return jsonify({"error": "Guest users are not allowed to access this resource"}), 403
+                # return jsonify({"error": "Guest users are not allowed to access this resource"}), 403
+                print(f"Guest access granted for user_id: {user_id}")
             elif user["role"] == 1:
                 print(f"Superadmin access granted for user_id: {user_id}")  # Contoh logging tambahan
             

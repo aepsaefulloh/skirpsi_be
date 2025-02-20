@@ -11,7 +11,7 @@ def get_profile(user_id, *args, **kwargs):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute('SELECT id, username, fullname, email FROM users WHERE id = %s', (user_id,))
+        cursor.execute('SELECT id, username, fullname, email, role FROM users WHERE id = %s', (user_id,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()

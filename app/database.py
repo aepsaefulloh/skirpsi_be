@@ -65,6 +65,13 @@ def init_db():
             FOREIGN KEY (question_id) REFERENCES form_questions(id) ON DELETE CASCADE
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS setting (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            url VARCHAR(255) NOT NULL
+        )
+    ''')
     conn.commit()
     cursor.close()
     conn.close()

@@ -1,7 +1,7 @@
 # app/services/user_service.py
 from flask import jsonify, request
 from app.database import get_db_connection
-from app.utils.auth import jwt_required  # Middleware JWT
+from app.utils.auth import jwt_required
 
 @jwt_required
 def get_all_users(user_id, *args, **kwargs):
