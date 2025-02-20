@@ -20,8 +20,7 @@ def get_all_setting(user_id, *args, **kwargs):
         return jsonify({"error": str(e)}), 500
 
 
-@jwt_required
-def get_setting_by_id(user_id, setting_id, *args, **kwargs):
+def get_setting_by_id( setting_id, *args, **kwargs):
     """
     Get a specific setting by ID.
     """
