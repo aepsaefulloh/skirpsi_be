@@ -1,11 +1,14 @@
 from flask import request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 from app.services.register_service import register_user
 from app.services.login_service import login_user
 from app.services.profile_service import get_profile
 from app.services.forgot_service import forgot_password
-from app.services.form_service import get_forms, create_form, update_form, delete_form, get_form, submit_answers
+from app.services.form_service import get_forms, create_form, update_form, delete_form, get_form, submit_answers, fetch_users_with_filled_forms, get_answers_by_user_form
 from app.services.user_service import get_all_users, get_user_by_id, update_user
+from app.services.setting_service import (
+    get_all_setting, get_setting_by_id, create_setting, update_setting, delete_setting
+)
 def init_routes(app):
     CORS(app)  # Enable CORS for all routes
 
@@ -116,5 +119,50 @@ def init_routes(app):
             return submit_answers(form_id, data["answers"])
         except Exception as e:
             return {"error": str(e)}, 500
+    
+    @app.route('/users/filled-forms', methods=['GET'])
+    def get_users_with_filled_forms():
+        return fetch_users_with_filled_forms()
+    
+    @app.route('/form/<int:requested_user_id>/answers/<int:form_id>', methods=['GET'])
+    def get_form_answers_by_user(requested_user_id, form_id):
+        return get_answers_by_user_form(requested_user_id, form_id)
+
+    @app.route('/settings', methods=['GET'])
+    def get_settings(): 
+        return get_all_setting()
+
+    @app.route('/settings/<int:setting_id>', methods=['GET'])
+    def get_single_setting(setting_id):
+        return get_setting_by_id(setting_id)
+
+    @app.route('/settings', methods=['POST'])
+    def create_new_setting():
+        try:
+            data = request.get_json()
+            if not data or "url" not in data:
+                return {"error": "Missing required fields"}, 400
+            return create_setting()
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+    @app.route('/settings/<int:setting_id>', methods=['PUT'])
+    def update_existing_setting(setting_id):
+        try:
+            data = request.get_json()
+            if not data or "url" not in data:
+                return {"error": "Missing required fields"}, 400
+            return update_setting(setting_id)
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+    @app.route('/settings/<int:setting_id>', methods=['DELETE'])
+    def delete_existing_setting(setting_id):
+        try:
+            return delete_setting(setting_id)
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+    
 
         

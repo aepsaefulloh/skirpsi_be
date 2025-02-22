@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 11, 2025 at 10:27 AM
+-- Generation Time: Feb 20, 2025 at 11:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,7 +39,8 @@ CREATE TABLE `forms` (
 --
 
 INSERT INTO `forms` (`id`, `title`, `status`, `created_at`) VALUES
-(1, 'Pertanyaan mendasar seputar teknologi', 1, '2025-02-11 08:19:17');
+(1, 'Pertanyaan mendasar seputar teknologi', 1, '2025-02-11 08:19:17'),
+(2, 'Survey Skill Kepribadian', 1, '2025-02-20 04:53:17');
 
 -- --------------------------------------------------------
 
@@ -55,6 +56,18 @@ CREATE TABLE `form_answers` (
   `answer_text` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form_answers`
+--
+
+INSERT INTO `form_answers` (`id`, `form_id`, `question_id`, `user_id`, `answer_text`, `created_at`) VALUES
+(31, 2, 5, 3, 'Poor', '2025-02-20 05:50:08'),
+(32, 2, 6, 3, 'Average', '2025-02-20 05:50:08'),
+(33, 2, 7, 3, 'Intermediate', '2025-02-20 05:50:08'),
+(34, 2, 8, 3, 'Intermediate', '2025-02-20 05:50:08'),
+(35, 2, 9, 3, 'Intermediate', '2025-02-20 05:50:08'),
+(36, 2, 10, 3, 'Average', '2025-02-20 05:50:08');
 
 -- --------------------------------------------------------
 
@@ -80,7 +93,31 @@ INSERT INTO `form_questions` (`id`, `form_id`, `question_text`, `category`, `opt
 (1, 1, 'Apakah anda menyukai pembahasan teknologi ?', 'text', '[]', 0, '2025-02-11 08:19:17'),
 (2, 1, 'Bagaimana anda menanggapi kemajuan teknologi ?', 'text', '[]', 0, '2025-02-11 08:19:17'),
 (3, 1, 'Sosial media yang anda gunakan saat ini ?', 'multiple_choice', '[\"Facebook\", \"Twitter\", \"Instagram\", \"Reddit\"]', 0, '2025-02-11 08:19:17'),
-(4, 1, 'Apakah anda memiliki pengalaman dibidang teknologi ?', 'rating', '[\"Ya\", \"Tidak\"]', 0, '2025-02-11 08:19:17');
+(4, 1, 'Apakah anda memiliki pengalaman dibidang teknologi ?', 'rating', '[\"Ya\", \"Tidak\"]', 0, '2025-02-11 08:19:17'),
+(5, 2, 'Programming Skill', 'rating', '[\"Not Interested\", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\", \"Professional\"]', 1, '2025-02-20 04:53:17'),
+(6, 2, 'Database Fundamentals', 'rating', '[\"Not Interested \", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\", \"Professional\"]', 1, '2025-02-20 04:53:17'),
+(7, 2, 'Computer Architecture', 'rating', '[\"Not Interested \", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\"]', 1, '2025-02-20 04:53:17'),
+(8, 2, 'Cyber Security', 'rating', '[\"Not Interested\", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\", \"Professional\"]', 1, '2025-02-20 04:53:17'),
+(9, 2, 'Computer Networking', 'rating', '[\"Not Interested \", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\", \"Professional\"]', 1, '2025-02-20 04:53:17'),
+(10, 2, 'Project Management', 'rating', '[\"Not Interested\", \"Poor\", \"Beginner\", \"Average\", \"Intermediate\", \"Excellent\", \"Professional\"]', 1, '2025-02-20 04:53:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `setting`
+--
+
+CREATE TABLE `setting` (
+  `id` int(11) NOT NULL,
+  `url` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `setting`
+--
+
+INSERT INTO `setting` (`id`, `url`) VALUES
+(1, 'survey/2');
 
 -- --------------------------------------------------------
 
@@ -135,6 +172,12 @@ ALTER TABLE `form_questions`
   ADD KEY `form_id` (`form_id`);
 
 --
+-- Indexes for table `setting`
+--
+ALTER TABLE `setting`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -149,19 +192,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `forms`
 --
 ALTER TABLE `forms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `form_answers`
 --
 ALTER TABLE `form_answers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `form_questions`
 --
 ALTER TABLE `form_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `setting`
+--
+ALTER TABLE `setting`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
