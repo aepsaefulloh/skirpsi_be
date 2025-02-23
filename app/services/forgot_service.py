@@ -12,12 +12,10 @@ def forgot_password(username, last_four_nisn, new_password):
         if not user:
             return {"error": "User not found"}, 404
         
-        # Konversi NISN ke string sebelum mengambil 4 digit terakhir
         nisn_str = str(user["nisn"])
         if nisn_str[-4:] != str(last_four_nisn):
             return {"error": "Invalid NISN verification"}, 401
         
-        # Hash password baru
         hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         cursor.execute('UPDATE users SET password = %s WHERE username = %s', (hashed_password, username))
         conn.commit()

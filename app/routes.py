@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_cors import CORS
+import numpy as np
 from app.services.register_service import register_user
 from app.services.login_service import login_user
 from app.services.profile_service import get_profile
@@ -9,6 +10,8 @@ from app.services.user_service import get_all_users, get_user_by_id, update_user
 from app.services.setting_service import (
     get_all_setting, get_setting_by_id, create_setting, update_setting, delete_setting
 )
+from app.services.knn_service import predict_kejuruan
+
 def init_routes(app):
     CORS(app)  # Enable CORS for all routes
 
@@ -112,13 +115,7 @@ def init_routes(app):
 
     @app.route('/form/<int:form_id>/submit', methods=['POST'])
     def submit_form_answers(form_id):
-        try:
-            data = request.get_json()
-            if not data or "answers" not in data:
-                return {"error": "Missing required fields"}, 400
-            return submit_answers(form_id, data["answers"])
-        except Exception as e:
-            return {"error": str(e)}, 500
+        return submit_answers(form_id)
     
     @app.route('/users/filled-forms', methods=['GET'])
     def get_users_with_filled_forms():
@@ -162,6 +159,26 @@ def init_routes(app):
             return delete_setting(setting_id)
         except Exception as e:
             return {"error": str(e)}, 500
+        
+    @app.route('/predict-kejuruan', methods=['POST'])
+    def predict_kejuruan_api():
+        try:
+            data = request.get_json(force=True, silent=True)
+
+            if not data or "answers" not in data:
+                return jsonify({"error": "Invalid JSON or missing 'answers' field"}), 400
+
+            prediction = predict_kejuruan(data["answers"])
+
+            if prediction is None:
+                return jsonify({"error": "No training data available. Please submit responses first."}), 400
+
+            return jsonify({"predicted_kejuruan": prediction}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+
+
 
     
 

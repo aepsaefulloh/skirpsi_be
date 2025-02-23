@@ -2,7 +2,7 @@
 import jwt
 from flask import request, jsonify
 from app.database import get_db_connection
-from app.utils.auth import jwt_required  # Import middleware JWT
+from app.utils.auth import jwt_required
 
 SECRET_KEY = "your_secret_key"
 

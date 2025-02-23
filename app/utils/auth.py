@@ -18,7 +18,6 @@ def jwt_required(f):
             decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_token["user_id"]
             
-            # Dapatkan role pengguna dari database
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
             cursor.execute('SELECT role FROM users WHERE id = %s', (user_id,))
@@ -29,12 +28,10 @@ def jwt_required(f):
             if not user:
                 return jsonify({"error": "User not found"}), 404
             
-            # Role-based handling
             if user["role"] == 99:
-                # return jsonify({"error": "Guest users are not allowed to access this resource"}), 403
                 print(f"Guest access granted for user_id: {user_id}")
             elif user["role"] == 1:
-                print(f"Superadmin access granted for user_id: {user_id}")  # Contoh logging tambahan
+                print(f"Superadmin access granted for user_id: {user_id}") 
             
             return f(user_id, *args, **kwargs) 
         except jwt.ExpiredSignatureError:

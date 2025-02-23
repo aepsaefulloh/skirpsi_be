@@ -2,7 +2,9 @@
 from flask import request, jsonify
 import json
 from app.database import get_db_connection
+from app.services.knn_service import predict_kejuruan
 from app.utils.auth import jwt_required
+
 
 @jwt_required
 def create_form(user_id, title, questions):
@@ -138,29 +140,59 @@ def get_form(user_id, form_id):
         return jsonify({"error": str(e)}), 400
 
 @jwt_required
-def submit_answers(user_id, form_id, answers):
+def submit_answers(user_id, form_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
+        data = request.get_json()
+        answers = data.get("answers", [])
+
+        if not answers:
+            return jsonify({"error": "No answers provided"}), 400
+
         for answer in answers:
+            question_id = answer.get("question_id")
+            answer_text = answer.get("answer_text")
+
+            if not question_id or not answer_text:
+                continue  
+
             cursor.execute("INSERT INTO form_answers (form_id, question_id, user_id, answer_text) VALUES (%s, %s, %s, %s)",
-                           (form_id, answer["question_id"], user_id, answer["answer_text"]))
-        
+                           (form_id, question_id, user_id, answer_text))
+
+        conn.commit()
+
+        user_answers = {ans["question_id"]: ans["answer_text"] for ans in answers}
+
+        prediction = predict_kejuruan(user_answers)
+
+        if prediction is None:
+            return jsonify({"message": "Answers submitted successfully", "predicted_kejuruan": "No prediction available. Please submit more data."}), 200
+
+        cursor.execute("INSERT INTO kejuruan_answers (user_id, kejuruan) VALUES (%s, %s) ON DUPLICATE KEY UPDATE kejuruan = VALUES(kejuruan)",
+                       (user_id, prediction))
+
+        cursor.execute("UPDATE form_answers SET kejuruan = %s WHERE user_id = %s AND form_id = %s",
+                       (prediction, user_id, form_id))
+
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"message": "Answers submitted successfully"}), 201
+
+        return jsonify({"message": "Answers submitted successfully", "predicted_kejuruan": prediction}), 200
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
+
 
 @jwt_required
 def fetch_users_with_filled_forms(*args):
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Query hanya menampilkan user yang telah mengisi form (ada di form_answers)
         query = """
             SELECT DISTINCT u.id AS user_id, u.fullname, u.username, u.email, u.nisn, 
                             f.id AS form_id, f.title AS form_title
@@ -178,7 +210,6 @@ def fetch_users_with_filled_forms(*args):
         if not data:
             return jsonify({"error": "No users found with filled forms"}), 404
 
-        # Strukturkan data dalam format JSON
         users_dict = {}
         for row in data:
             user_id = row["user_id"]
@@ -207,7 +238,6 @@ def get_answers_by_user_form(requested_user_id, form_id, *args):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Pastikan requested_user_id valid di tabel users
         query_user = "SELECT id FROM users WHERE id = %s"
         cursor.execute(query_user, (requested_user_id,))
         user = cursor.fetchone()
@@ -217,7 +247,6 @@ def get_answers_by_user_form(requested_user_id, form_id, *args):
             conn.close()
             return jsonify({"error": "User not found"}), 404
 
-        # Query untuk mendapatkan question_id, answer_text, dan form_title
         query_answers = """
             SELECT answer_text, (
                 SELECT question_text FROM form_questions WHERE form_questions.id = form_answers.question_id
@@ -227,11 +256,11 @@ def get_answers_by_user_form(requested_user_id, form_id, *args):
             FROM form_answers 
             WHERE form_id = %s AND user_id = %s 
         """
-        print(f"Executing query: {query_answers} with values ({requested_user_id}, {form_id})")  # Debugging log
+        print(f"Executing query: {query_answers} with values ({requested_user_id}, {form_id})")
         cursor.execute(query_answers, (requested_user_id, form_id))
         tempAnswer = cursor.fetchall()
 
-        print(f"Query result: {tempAnswer}")  # Debugging log
+        print(f"Query result: {tempAnswer}")  
 
         cursor.close()
         conn.close()
@@ -255,7 +284,20 @@ def get_answers_by_user_form(requested_user_id, form_id, *args):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@jwt_required
+def predict_skill_level(user_id):
+    try:
+        data = request.json
+        answers = data.get("answers", {})
 
+        if not answers:
+            return jsonify({"error": "No answers provided"}), 400
+
+        prediction = predict_level(answers)
+
+        return jsonify({"predicted_user_id": prediction}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 

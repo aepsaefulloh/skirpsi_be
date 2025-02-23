@@ -44,7 +44,6 @@ def update_user(user_id, requested_user_id, *args, **kwargs):
     Update a specific user by their ID.
     """
     try:
-        # Validasi input data
         data = request.get_json()
         required_fields = ["fullname", "email", "date_of_birth"]
         for field in required_fields:
@@ -54,7 +53,6 @@ def update_user(user_id, requested_user_id, *args, **kwargs):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Cek role pengguna
         cursor.execute("SELECT role FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
 
@@ -65,16 +63,13 @@ def update_user(user_id, requested_user_id, *args, **kwargs):
 
         role = user["role"]
 
-        # Role-based authorization
         if role == 99:
             return jsonify({"error": "Guest users are not allowed to update user data"}), 403
         elif role != 1 and int(user_id) != int(requested_user_id):
-            # Selain superadmin, hanya bisa mengupdate data dirinya sendiri
             cursor.close()
             conn.close()
             return jsonify({"error": "You are not authorized to update this user"}), 403
 
-        # Update user data
         cursor.execute(
             "UPDATE users SET fullname = %s, email = %s, date_of_birth = %s WHERE id = %s",
             (data["fullname"], data["email"], data["date_of_birth"], requested_user_id)

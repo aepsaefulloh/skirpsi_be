@@ -18,12 +18,6 @@ def login_user(username, password):
         if not user:
             return {"error": "Invalid username or password"}, 401
 
-        # Handle role
-        # if user["role"] == 99:
-        #     return {"error": "Guest users are not allowed to login"}, 403
-        # elif user["role"] == 1:
-        #     print(f"Superadmin {username} is logging in...") 
-
         if bcrypt.checkpw(password.encode(), user["password"].encode()):
             token = jwt.encode({
                 "user_id": user["id"],

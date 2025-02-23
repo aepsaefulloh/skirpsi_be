@@ -1,7 +1,7 @@
 # app/services/setting_service.py
 from flask import jsonify, request
 from app.database import get_db_connection
-from app.utils.auth import jwt_required  # Middleware JWT
+from app.utils.auth import jwt_required 
 
 @jwt_required
 def get_all_setting(user_id, *args, **kwargs):
@@ -80,7 +80,6 @@ def update_setting(user_id, setting_id, *args, **kwargs):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Cek apakah setting ada
         cursor.execute("SELECT id FROM setting WHERE id = %s", (setting_id,))
         setting = cursor.fetchone()
 
@@ -89,7 +88,6 @@ def update_setting(user_id, setting_id, *args, **kwargs):
             conn.close()
             return jsonify({"error": "Setting not found"}), 404
 
-        # Update setting data
         cursor.execute("UPDATE setting SET url = %s WHERE id = %s", (data["url"], setting_id))
         conn.commit()
 
@@ -110,7 +108,6 @@ def delete_setting(user_id, setting_id, *args, **kwargs):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Cek apakah setting ada
         cursor.execute("SELECT id FROM setting WHERE id = %s", (setting_id,))
         setting = cursor.fetchone()
 
@@ -119,7 +116,6 @@ def delete_setting(user_id, setting_id, *args, **kwargs):
             conn.close()
             return jsonify({"error": "Setting not found"}), 404
 
-        # Hapus setting
         cursor.execute("DELETE FROM setting WHERE id = %s", (setting_id,))
         conn.commit()
 

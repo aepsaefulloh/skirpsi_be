@@ -60,6 +60,7 @@ def init_db():
             question_id INT NOT NULL,
             user_id INT NOT NULL,
             answer_text TEXT NOT NULL,
+            kejuruan VARCHAR(100) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
             FOREIGN KEY (question_id) REFERENCES form_questions(id) ON DELETE CASCADE
@@ -72,6 +73,16 @@ def init_db():
             url VARCHAR(255) NOT NULL
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS kejuruan_answers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            kejuruan VARCHAR(100) NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    ''')
+
     conn.commit()
     cursor.close()
     conn.close()
