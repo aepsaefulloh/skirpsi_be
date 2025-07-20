@@ -132,12 +132,17 @@ def get_form(user_id, form_id):
         cursor.execute("SELECT * FROM form_questions WHERE form_id = %s", (form_id,))
         questions = cursor.fetchall()
         
+        for question in questions:
+            raw_options = json.loads(question["options"])
+            question["options"] = [{"id": i, "title": option} for i, option in enumerate(raw_options)]
+
         form["questions"] = questions
         cursor.close()
         conn.close()
         return jsonify(form), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
 
 @jwt_required
 def submit_answers(user_id, form_id):
@@ -154,12 +159,15 @@ def submit_answers(user_id, form_id):
         for answer in answers:
             question_id = answer.get("question_id")
             answer_text = answer.get("answer_text")
+            answer_index = answer.get("answer_index")
 
             if not question_id or not answer_text:
                 continue  
 
-            cursor.execute("INSERT INTO form_answers (form_id, question_id, user_id, answer_text) VALUES (%s, %s, %s, %s)",
-                           (form_id, question_id, user_id, answer_text))
+            cursor.execute("""
+                INSERT INTO form_answers (form_id, question_id, user_id, answer_text, answer_index) 
+                VALUES (%s, %s, %s, %s, %s)
+            """, (form_id, question_id, user_id, answer_text, answer_index))
 
         conn.commit()
 
@@ -168,19 +176,31 @@ def submit_answers(user_id, form_id):
         prediction = predict_kejuruan(user_answers)
 
         if prediction is None:
-            return jsonify({"message": "Answers submitted successfully", "predicted_kejuruan": "No prediction available. Please submit more data."}), 200
+            return jsonify({
+                "message": "Answers submitted successfully", 
+                "predicted_kejuruan": "No prediction available. Please submit more data."
+            }), 200
 
-        cursor.execute("INSERT INTO kejuruan_answers (user_id, kejuruan) VALUES (%s, %s) ON DUPLICATE KEY UPDATE kejuruan = VALUES(kejuruan)",
-                       (user_id, prediction))
+        cursor.execute("""
+            INSERT INTO kejuruan_answers (user_id, kejuruan) 
+            VALUES (%s, %s) 
+            ON DUPLICATE KEY UPDATE kejuruan = VALUES(kejuruan)
+        """, (user_id, prediction))
 
-        cursor.execute("UPDATE form_answers SET kejuruan = %s WHERE user_id = %s AND form_id = %s",
-                       (prediction, user_id, form_id))
+        cursor.execute("""
+            UPDATE form_answers 
+            SET kejuruan = %s 
+            WHERE user_id = %s AND form_id = %s
+        """, (prediction, user_id, form_id))
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "Answers submitted successfully", "predicted_kejuruan": prediction}), 200
+        return jsonify({
+            "message": "Answers submitted successfully", 
+            "predicted_kejuruan": prediction
+        }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

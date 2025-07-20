@@ -12,6 +12,8 @@ from app.services.setting_service import (
 )
 from app.services.knn_service import predict_kejuruan
 
+from app.utils.train_knn_from_csv import predict_kejuruan_from_csv
+
 def init_routes(app):
     CORS(app)  # Enable CORS for all routes
 
@@ -159,19 +161,41 @@ def init_routes(app):
             return delete_setting(setting_id)
         except Exception as e:
             return {"error": str(e)}, 500
-        
+    
+    @app.route('/predict-kejuruan-db', methods=['POST'])
+    def predict_kejuruan_db_api():
+        """ API untuk prediksi kejuruan berdasarkan data dari database """
+        try:
+            data = request.get_json()
+            if not data or "answers" not in data:
+                return jsonify({"error": "Invalid JSON atau field 'answers' tidak ada"}), 400
+
+            user_answers = data["answers"]
+            if len(user_answers) < 1:
+                return jsonify({"error": "Jawaban tidak boleh kosong"}), 400
+
+            prediction = predict_kejuruan(user_answers)
+
+            if prediction is None:
+                return jsonify({"error": "Model belum siap, harap latih ulang dengan lebih banyak data"}), 400
+
+            return jsonify({"predicted_kejuruan": prediction}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    
     @app.route('/predict-kejuruan', methods=['POST'])
     def predict_kejuruan_api():
+        """ API untuk prediksi kejuruan """
         try:
-            data = request.get_json(force=True, silent=True)
-
+            data = request.get_json()
             if not data or "answers" not in data:
                 return jsonify({"error": "Invalid JSON or missing 'answers' field"}), 400
 
-            prediction = predict_kejuruan(data["answers"])
+            user_answers = data["answers"]
+            if len(user_answers) != 6:  # Sesuaikan jumlah fitur dengan dataset
+                return jsonify({"error": "Jumlah jawaban tidak sesuai dengan dataset"}), 400
 
-            if prediction is None:
-                return jsonify({"error": "No training data available. Please submit responses first."}), 400
+            prediction = predict_kejuruan_from_csv(user_answers)
 
             return jsonify({"predicted_kejuruan": prediction}), 200
         except Exception as e:

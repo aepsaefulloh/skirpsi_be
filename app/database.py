@@ -60,6 +60,7 @@ def init_db():
             question_id INT NOT NULL,
             user_id INT NOT NULL,
             answer_text TEXT NOT NULL,
+            answer_index INT NOT NULL,
             kejuruan VARCHAR(100) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
